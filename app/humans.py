@@ -1,6 +1,5 @@
-import model_download
-
 from collections import defaultdict
+import matplotlib.pyplot as plt
 from datetime import datetime
 import logging
 import sys
@@ -9,13 +8,30 @@ import tensorflow as tf
 from PIL import Image
 import numpy as np
 
+
+sys.path.append("../models")
+sys.path.append("../models/object_detection")
+
+import utils.visualization_utils as vis_util
+from utils import label_map_util
+import model_download
+
+
+
 log = logging.getLogger()
 log.addHandler(logging.StreamHandler())
 log.setLevel(logging.DEBUG)
 
-sys.path.append("..")
 
-category_index = {1: {'id': 1, 'name': 'person'}}
+
+PATH_TO_LABELS = '../models/object_detection/data/mscoco_label_map.pbtxt'
+NUM_CLASSES = 100 # person has index 1
+
+label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
+categories = label_map_util.convert_label_map_to_categories(
+    label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
+
+category_index = label_map_util.create_category_index(categories)
 
 log.debug("building graph")
 
@@ -106,7 +122,7 @@ def draw_on_image(image_path, outfile, session):
                       category_index,
                       use_normalized_coordinates=True,
                       line_thickness=8)
-    image_np.save(outfile)
+    plt.imsave(outfile, image_np)
 
 if __name__ == "__main__":
     benchmark()
