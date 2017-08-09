@@ -1,21 +1,20 @@
 from collections import defaultdict
-import matplotlib.pyplot as plt
 from datetime import datetime
 import logging
 import sys
 
+import matplotlib.pyplot as plt
 import tensorflow as tf
 from PIL import Image
 import numpy as np
 
+import config
 
-sys.path.append("../models")
-sys.path.append("../models/object_detection")
+sys.path.append(config.MODELS_DIR)
+sys.path.append(config.OBJECT_DETECTION_DIR)
 
 import utils.visualization_utils as vis_util
 from utils import label_map_util
-import model_download
-
 
 
 log = logging.getLogger()
@@ -24,10 +23,9 @@ log.setLevel(logging.DEBUG)
 
 
 
-PATH_TO_LABELS = '../models/object_detection/data/mscoco_label_map.pbtxt'
 NUM_CLASSES = 100 # person has index 1
 
-label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
+label_map = label_map_util.load_labelmap(config.PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(
     label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
 
@@ -38,7 +36,7 @@ log.debug("building graph")
 detection_graph = tf.Graph()
 with detection_graph.as_default():
     od_graph_def = tf.GraphDef()
-    with tf.gfile.GFile(model_download.PATH_TO_CKPT, 'rb') as fid:
+    with tf.gfile.GFile(config.PATH_TO_CKPT, 'rb') as fid:
         serialized_graph = fid.read()
         od_graph_def.ParseFromString(serialized_graph)
         tf.import_graph_def(od_graph_def, name='')
@@ -49,9 +47,10 @@ log.debug("loaded graph into memory")
 def load_image_into_numpy_array(image_path):
     image = Image.open(image_path)
     im_width, im_height = image.size
-    return np.array(image.getdata()).reshape(
+    return np.array(image.convert("RGB").getdata()).reshape(
         (im_height, im_width, 3)).astype(np.uint8)
 
+    return final_boxes, final_scores, classes
 
 def find_people(image_path, sess):
     # the array based representation of the image will be used later in order to prepare the
@@ -81,11 +80,24 @@ def find_people(image_path, sess):
 
 def get_people(img, sess, min_score_thresh=0.5):
     boxes, scores, classes, image_np = find_people(img, sess)
-    scores_above_threshold = [s for s in scores[0] if s > min_score_thresh]
+
+
+    boxes2 = []
+    scores2 = []
+    classes2 = []
+
+    for box, score, class_ in zip(boxes[0], scores[0], classes[0]):
+        if score > min_score_thresh:
+            if class_ == 1:
+                print(box, score, class_)
+                boxes2.append(box)
+                classes2.append(class_)
+                scores2.append(score)
+
     
     return [
         {"score": score, "box": box}
-        for box, score in zip(boxes[0], scores_above_threshold)
+        for box, score in zip(boxes2, scores2)
     ]
 
 
@@ -126,4 +138,3 @@ def draw_on_image(image_path, outfile, session):
 
 if __name__ == "__main__":
     benchmark()
-
