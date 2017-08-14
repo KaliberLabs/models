@@ -17,4 +17,3 @@ if __name__ == "__main__":
         file_name = os.path.basename(file.name)
         if 'frozen_inference_graph.pb' in file_name:
             tar_file.extract(file, os.getcwd())
-

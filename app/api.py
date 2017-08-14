@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route("/", methods=["POST"])
 def recieve():
-    fn = "tmp.png"
+    fn = "/tmp/humanspic.png"
     with open(fn, "wb") as f:
         f.write(request.stream.read())
     matches = humans.get_people(open(fn), "rb", session)

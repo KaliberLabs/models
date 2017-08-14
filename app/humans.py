@@ -50,7 +50,6 @@ def load_image_into_numpy_array(image_path):
     return np.array(image.convert("RGB").getdata()).reshape(
         (im_height, im_width, 3)).astype(np.uint8)
 
-    return final_boxes, final_scores, classes
 
 def find_people(image_path, sess):
     # the array based representation of the image will be used later in order to prepare the
