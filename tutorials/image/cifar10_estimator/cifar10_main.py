@@ -73,44 +73,49 @@ tf.flags.DEFINE_float('momentum', 0.9, 'Momentum for MomentumOptimizer.')
 
 tf.flags.DEFINE_float('weight_decay', 2e-4, 'Weight decay for convolutions.')
 
+tf.flags.DEFINE_float('learning_rate', 0.1,
+                      'This is the inital learning rate value.'
+                      ' The learning rate will decrease during training.'
+                      ' For more details check the model_fn implementation'
+                      ' in this file.')
+
 tf.flags.DEFINE_boolean('use_distortion_for_training', True,
                         'If doing image distortion for training.')
 
 tf.flags.DEFINE_boolean('run_experiment', False,
                         'If True will run an experiment,'
-                        'otherwise will run training and evaluation'
-                        'using the estimator interface.'
-                        'Experiments perform training on several workers in'
-                        'parallel, in other words experiments know how to'
+                        ' otherwise will run training and evaluation'
+                        ' using the estimator interface.'
+                        ' Experiments perform training on several workers in'
+                        ' parallel, in other words experiments know how to'
                         ' invoke train and eval in a sensible fashion for'
                         ' distributed training.')
 
 tf.flags.DEFINE_boolean('sync', False,
                         'If true when running in a distributed environment'
-                        'will run on sync mode')
+                        ' will run on sync mode.')
 
-tf.flags.DEFINE_integer('num_workers', 1, 'Number of workers')
+tf.flags.DEFINE_integer('num_workers', 1, 'Number of workers.')
 
 # Perf flags
 tf.flags.DEFINE_integer('num_intra_threads', 1,
-                        """Number of threads to use for intra-op parallelism.
-                        If set to 0, the system will pick an appropriate number.
-                        The default is 1 since in this example CPU only handles
-                        the input pipeline and gradient aggregation (when
-                        --is_cpu_ps). Ops that could potentially benefit
-                        from intra-op parallelism are scheduled to run on GPUs.
-                        """)
+                        'Number of threads to use for intra-op parallelism.'
+                        ' If set to 0, the system will pick an appropriate number.'
+                        ' The default is 1 since in this example CPU only handles'
+                        ' the input pipeline and gradient aggregation (when'
+                        ' --is_cpu_ps). Ops that could potentially benefit'
+                        ' from intra-op parallelism are scheduled to run on GPUs.')
 
 tf.flags.DEFINE_integer('num_inter_threads', 0,
-                        """Number of threads to use for inter-op
-                       parallelism. If set to 0, the system will pick
-                       an appropriate number.""")
+                        'Number of threads to use for inter-op'
+                        ' parallelism. If set to 0, the system will pick'
+                        ' an appropriate number.')
 
 tf.flags.DEFINE_boolean('force_gpu_compatible', False,
-                        """whether to enable force_gpu_compatible in
-                        GPU_Options. Check
-                        tensorflow/core/protobuf/config.proto#L69
-                        for details.""")
+                        'Whether to enable force_gpu_compatible in'
+                        ' GPU_Options. Check'
+                        ' tensorflow/core/protobuf/config.proto#L69'
+                        ' for details.')
 
 # Debugging flags
 tf.flags.DEFINE_boolean('log_device_placement', False,
@@ -233,7 +238,7 @@ def _resnet_model_fn(features, labels, mode):
   Support single host, one or more GPU training. Parameter distribution can be
   either one of the following scheme.
   1. CPU is the parameter server and manages gradient updates.
-  2. Paramters are distributed evenly across all GPUs, and the first GPU
+  2. Parameters are distributed evenly across all GPUs, and the first GPU
      manages gradient updates.
 
   Args:
@@ -308,7 +313,8 @@ def _resnet_model_fn(features, labels, mode):
         num_batches_per_epoch * x
         for x in np.array([82, 123, 300], dtype=np.int64)
     ]
-    staged_lr = [0.1, 0.01, 0.001, 0.0002]
+    staged_lr = [FLAGS.learning_rate * x for x in [1, 0.1, 0.01, 0.002]]
+
     learning_rate = tf.train.piecewise_constant(tf.train.get_global_step(),
                                                 boundaries, staged_lr)
     # Create a nicely-named tensor for logging
@@ -358,7 +364,7 @@ def _tower_fn(is_training, weight_decay, feature, label, tower_losses,
   """Build computation tower for each device (CPU or GPU).
 
   Args:
-    is_training: true if is for training graph.
+    is_training: true if is training graph.
     weight_decay: weight regularization strength, a float.
     feature: a Tensor.
     label: a Tensor.
@@ -442,17 +448,18 @@ def get_experiment_fn(train_input_fn, eval_input_fn, train_steps, eval_steps,
   """
   def _experiment_fn(run_config, hparams):
     """Returns an Experiment."""
-    del hparams  # unused arg
-    # create estimator
+    del hparams  # Unused arg.
+    # Create estimator.
     classifier = tf.estimator.Estimator(model_fn=_resnet_model_fn,
                                         config=run_config)
+    # Create experiment.
     experiment = tf.contrib.learn.Experiment(
         classifier,
         train_input_fn=train_input_fn,
         eval_input_fn=eval_input_fn,
         train_steps=train_steps,
         eval_steps=eval_steps)
-    # adding hooks to estimator on training mode
+    # Adding hooks to be used by the estimator on training mode.
     experiment.extend_train_hooks(train_hooks)
     return experiment
   return _experiment_fn
