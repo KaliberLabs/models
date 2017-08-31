@@ -43,8 +43,3 @@ item {
   id: 9
   name: 'yellow-grocery-bag'
 }
-
-item {
-  id: 10
-  name: 'not-a-real-object'
-}
