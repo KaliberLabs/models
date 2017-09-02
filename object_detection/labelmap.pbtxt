@@ -1,0 +1,45 @@
+
+item {
+  id: 1
+  name: 'plastic-crate'
+}
+
+item {
+  id: 2
+  name: 'egg-carton'
+}
+
+item {
+  id: 3
+  name: 'milk-carton'
+}
+
+item {
+  id: 4
+  name: 'human-head'
+}
+
+item {
+  id: 5
+  name: 'silver-cart'
+}
+
+item {
+  id: 6
+  name: 'table'
+}
+
+item {
+  id: 7
+  name: 'green-grocery-bag'
+}
+
+item {
+  id: 8
+  name: 'green-grocery-bag'
+}
+
+item {
+  id: 9
+  name: 'yellow-grocery-bag'
+}

@@ -87,3 +87,14 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+.vscode
+
+object_detection/protos/*
+*.tar.gz
+
+object_detection/faster_rcnn_inception_resnet_v2_atrous_coco_11_06_2017/
+object_detection/rfcn_resnet101_coco_11_06_2017/
+object_detection/ssd_inception_v2_coco_11_06_2017/
+object_detection/ssd_mobilenet_v1_coco_11_06_2017/
+

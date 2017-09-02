@@ -1,3 +1,20 @@
+# Kaliber Labs fork of Tensor Flow Models
+
+It contains tools for detecting people and objects. 
+
+* models/ contains tensorflow models and tools
+* models/app/ contains wrappers around tensorflow models for use in applications
+
+Tools
+
+* models/app/detect_humans.py is a CLI tool that detects all the humans in a frame and writes to CSV.
+* models/app/draw_rects.py is an UNFINISHED CLI tool to draw rectangles around people in jpegs
+* models/app/model_download.py is a small program that downloads a TF model
+* models/app/api.py is an UNTESTED, NEVER USED REST wrapper around the detection model
+* models/app/humans.py is a library module that provides a usable abstraction around tensorflow code
+
+------------------------------
+
 # TensorFlow Models
 
 This repository contains machine learning models implemented in
