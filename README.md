@@ -13,6 +13,63 @@ Tools
 * models/app/api.py is an UNTESTED, NEVER USED REST wrapper around the detection model
 * models/app/humans.py is a library module that provides a usable abstraction around tensorflow code
 
+
+### Running the people detection model server
+
+Copy a tensorflow model
+
+    cd ~
+    clone this repo into $HOME
+    cd models/object_detection
+    aws s3 cp s3://kaliber-face-experiments/es/faster_rcnn_inception_resnet_v2_atrous_coco_11_06_2017_people_detector.pb .
+    cd ../app
+
+Check that in config.py are correct.
+
+
+    python app/api.py  
+
+    If you get an Out-Of-Memory (OOM) error, increase the GPU size or run the model on RAM like this:
+
+    CUDA_VISIBLE_DEVICES="" python app/api.py  
+
+  
+You can submit jpg images  like this:
+
+    ⋊> ~/Pictures curl -v --data-binary '@ejaj.jpg' 'http://ec2-52-90-84-45.compute-1.amazonaws.com:8888/' -v                                                                                                                                                         14:20:58
+    *   Trying 52.90.84.45...
+    * Connected to ec2-52-90-84-45.compute-1.amazonaws.com (52.90.84.45) port 8888 (#0)
+    > POST / HTTP/1.1
+    > Host: ec2-52-90-84-45.compute-1.amazonaws.com:8888
+    > User-Agent: curl/7.47.0
+    > Accept: */*
+    > Content-Length: 14931
+    > Content-Type: application/x-www-form-urlencoded
+    > Expect: 100-continue
+    > 
+    < HTTP/1.1 100 Continue
+    * We are completely uploaded and fine
+    ^[* HTTP 1.0, assume close after body
+    < HTTP/1.0 200 OK
+    < Content-Type: application/json
+    < Content-Length: 173
+    < Server: Werkzeug/0.12.1 Python/3.6.1
+    < Date: Tue, 19 Sep 2017 21:22:03 GMT
+    < 
+    [
+      {
+        "box": [
+          0.012828623875975609, 
+          0.0574076846241951, 
+          0.9920268058776855, 
+          0.9830871820449829
+        ], 
+        "score": 0.9998437166213989
+      }
+    ]
+    * Closing connection 0
+
+
 ------------------------------
 
 # TensorFlow Models
