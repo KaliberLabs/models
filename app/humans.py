@@ -1,3 +1,5 @@
+"""Code for recognizing humans"""
+
 from collections import defaultdict
 from datetime import datetime
 import logging
@@ -95,7 +97,7 @@ def get_people(img, sess, min_score_thresh=0.5):
 
     
     return [
-        {"score": score, "box": box}
+        {"score": float(score), "box": list(map(float, box))}
         for box, score in zip(boxes2, scores2)
     ]
 
